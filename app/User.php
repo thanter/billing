@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Cashier\Billable;
+use Laravel\Cashier\Subscription;
 
 class User extends Authenticatable
 {
@@ -28,4 +29,22 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+
+    public function subscriptionDetails(Subscription $subscription)
+    {
+        return Plan::details($subscription);
+    }
+
+
+
+
+    public function subscription()
+    {
+        $subscription = (new \App\Subscription)->newFromSubscription(
+            $this->subscriptions()->first()
+        );
+
+        return $subscription;
+    }
 }
