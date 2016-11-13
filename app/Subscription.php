@@ -6,6 +6,11 @@ use Laravel\Cashier\Subscription as CashierSubscription;
 
 class Subscription extends CashierSubscription
 {
+    /**
+     * The plan of the subscription
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function plan()
     {
         return $this->belongsTo(Plan::class, 'braintree_plan', 'braintree_plan_id');
@@ -22,11 +27,5 @@ class Subscription extends CashierSubscription
         $instance->exists = true;
 
         return $instance;
-    }
-
-
-    public function test()
-    {
-        dd('nteath');
     }
 }

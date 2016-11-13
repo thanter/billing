@@ -18,11 +18,49 @@ Route::get('/', function () {
 });
 
 
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+
+/***** Getting a new subscription *****/
+// GET
+Route::get('subscribe/{plan}', 'BillingController@getSubscribe')
+    ->where('plan', "high_monthly|low_monthly")
+    ->name('subscribe');
+// POST
+Route::post('subscribe/{plan}', 'BillingController@postSubscribe')
+    ->where('plan', "high_monthly|low_monthly")
+    ->name('subscribe');
+
+
+Route::get('subscription', 'BillingController@getSubscription')->name('subscription.status');
+
+
+Route::get('subscription/cancel', 'BillingController@cancelSubscription')->name('subscription.cancel');
+Route::get('subscription/cancelNow', 'BillingController@cancelSubscriptionForGood')->name('subscription.cancelNow');
+Route::get('subscription/reactivate', 'BillingController@reactivateSubscription')->name('subscription.reactivate');
+
+Route::get('subscription/upgrade', 'BillingController@upgrade')->name('subscription.upgrade');
+Route::get('subscription/downgrade', 'BillingController@downgrade')->name('subscription.downgrade');
+
+Route::get('paying', 'BillingController@getPayingMethod')->name('payment.method');
+Route::post('paying', 'BillingController@postPayingMethod')->name('payment.method');
+
+
+
+
+
+
+
+
 Route::get("/nteath", function()
 {
     $user = User::find(2);
 
     $subscription = $user->subscription();
+
+    return $subscription;
 
     $plan = $subscription->plan;
 
@@ -30,25 +68,3 @@ Route::get("/nteath", function()
 
     return $user->subscription();
 });
-
-
-
-Auth::routes();
-
-Route::get('/home', 'HomeController@index');
-
-
-
-Route::get('subscribe/{plan}', 'BillingController@getSubscribe')
-    ->where('plan', "high|low")
-    ->name('subscribe');
-Route::post('subscribe/{plan}', 'BillingController@postSubscribe')
-    ->where('plan', "high_monthly|low_monthly")
-    ->name('subscribe');
-
-
-Route::get('subscription', 'BillingController@getSubscription');
-Route::get('subscription/cancel', 'BillingController@cancelSubscription');
-
-Route::get('paying', 'BillingController@getPayingMethod');
-Route::post('paying', 'BillingController@postPayingMethod');

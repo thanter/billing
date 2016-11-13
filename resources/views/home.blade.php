@@ -8,7 +8,12 @@
                 <div class="panel-heading">Dashboard</div>
 
                 <div class="panel-body">
-                    You are logged in!
+                    <p>
+                        I want the cheap plan for <a href="{{ route('subscribe', 'low_monthly') }}">$5 per month</a>
+                    </p>
+                    <p>
+                        I want the expensive plan for <a href="{{ route('subscribe', 'high_monthly') }}">$10 per month</a>
+                    </p>
                 </div>
             </div>
         </div>

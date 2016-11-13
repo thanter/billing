@@ -43,7 +43,9 @@
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
-                        &nbsp;
+                        &nbsp;<li><a href="{{ route('home') }}">Home</a></li>
+                        <li><a href="{{ route('subscription.status') }}">Subscription</a></li>
+                        <li><a href="{{ route('home') }}">Pricing</a></li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -53,6 +55,13 @@
                             <li><a href="{{ url('/login') }}">Login</a></li>
                             <li><a href="{{ url('/register') }}">Register</a></li>
                         @else
+                            @if (Auth::user()->subscription() !==  null)
+                                <li>
+                                    <a href="{{ route('payment.method') }}">
+                                        <i class="fa fa-dollar"></i> Payment method
+                                    </a>
+                                </li>
+                            @endif
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                     {{ Auth::user()->name }} <span class="caret"></span>

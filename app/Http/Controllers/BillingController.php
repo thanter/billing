@@ -9,85 +9,119 @@ use Illuminate\Http\Request;
 
 class BillingController extends Controller
 {
-    public function getSubscribe($plan)
+    public function getSubscribe($planName)
     {
-        $plan = strtolower($plan) . "_monthly";
-
-        switch($plan)
-        {
-            case 'low_monthly':
-                $price = 5;
-                break;
-            case 'high_monthly':
-                $price = 10;
-                break;
-        }
+        $plan = Plan::findByName($planName);
 
         $clientToken = Braintree_ClientToken::generate();
+        $subscription = auth()->user()->subscription();
 
-        return view('billing.subscribe', compact('clientToken', 'plan', 'price'));
+        return view('billing.subscribe', compact('clientToken', 'plan', 'subscription'));
     }
 
 
-    public function postSubscribe(Request $request, $plan)
+    public function postSubscribe(Request $request, $planName)
     {
         $user = auth()->user();
+        if ($user->subscription()->active()) {
+            $user->subscription()->cancelNow();
+        }
+
         $paymentMethodNonce = request('payment_method_nonce');
 
-        // Laravel\Cashier\Subscription
-        $what = $user->newSubscription('default', $plan)->create($paymentMethodNonce);
+        // returns Laravel\Cashier\Subscription
+        $user->newSubscription('default', $planName)->create($paymentMethodNonce);
 
-        return redirect()->to('subscription');
+        return redirect()->route('subscription.status');
     }
+
 
 
     public function getSubscription()
     {
-        $user = auth()->user();
-
-        $subscription = $user->subscription();
+        $subscription = auth()->user()->subscription();
 
         if ($subscription->active()) {
-            dd($user->subscriptionDetails($subscription));
             return view('billing.subscription', compact('subscription'));
         }
 
-        return redirect()->to('subscribe');
+        return redirect()->route('home');
     }
+
 
 
     public function cancelSubscription()
     {
-        $user = User::find(1);
+        $response = auth()->user()->subscription()->cancel();
 
-        $response = $user->subscription()->cancelNow();
-
-        return redirect()->to('subscription');
+        return redirect()->route('subscription.status');
     }
+
+
+    public function reactivateSubscription()
+    {
+        $response = auth()->user()->subscription()->resume();
+
+        return redirect()->route('subscription.status');
+    }
+
+
+    public function cancelSubscriptionForGood()
+    {
+        $response = auth()->user()->subscription()->cancelNow();
+
+        return redirect()->route('subscription.status');
+    }
+
+
+    public function upgrade()
+    {
+        $planName = 'high_monthly';
+
+        $response = auth()->user()->subscription()->swap($planName);
+
+        return redirect()->route('subscription.status');
+    }
+
+
+    public function downgrade()
+    {
+        $planName = 'low_monthly';
+
+        $response = auth()->user()->subscription()->swap($planName);
+
+        return redirect()->route('subscription.status');
+    }
+
+
 
 
     public function getPayingMethod()
     {
-        $user = User::find(1);
-
         $clientToken = \Braintree_ClientToken::generate([
-            "customerId" => $user->braintree_id
+            "customerId" => auth()->user()->braintree_id
         ]);
 
-        $paymentMethod = $user->asBraintreeCustomer()->defaultPaymentMethod();
+        $paymentMethod = auth()->user()->asBraintreeCustomer()->defaultPaymentMethod();
 
-        return view('billing.paymentMethod', compact('paymentMethod', 'clientToken'));
+        if ($paymentMethod instanceof \Braintree\PayPalAccount) {
+            $isPaypal = true;
+        }
+
+        if ($paymentMethod instanceof \Braintree\CreditCard) {
+            $isPaypal = false;
+        }
+
+        return view('billing.paymentMethod', compact('paymentMethod', 'isPaypal', 'clientToken'));
     }
 
 
     public function postPayingMethod(Request $request)
     {
-        $user = User::find(1);
-
         $creditCardToken = request('payment_method_nonce');
 
-        $user->updateCard($creditCardToken);
+        auth()->user()->updateCard($creditCardToken);
 
-        return redirect()->to('paying');
+        return redirect()->route('payment.method');
     }
 }

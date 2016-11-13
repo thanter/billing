@@ -31,14 +31,6 @@ class User extends Authenticatable
     ];
 
 
-    public function subscriptionDetails(Subscription $subscription)
-    {
-        return Plan::details($subscription);
-    }
-
-
-
-
     public function subscription()
     {
         $subscription = (new \App\Subscription)->newFromSubscription(
