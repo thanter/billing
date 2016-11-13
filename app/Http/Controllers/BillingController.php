@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Plan;
-use App\User;
 use Braintree_ClientToken;
 use Illuminate\Http\Request;
 
@@ -23,7 +22,10 @@ class BillingController extends Controller
     public function postSubscribe(Request $request, $planName)
     {
         $user = auth()->user();
-        if ($user->subscription()->active()) {
+
+        $subscription = $user->subscription();
+
+        if ($subscription and $subscription->active()) {
             $user->subscription()->cancelNow();
         }
 
@@ -41,7 +43,7 @@ class BillingController extends Controller
     {
         $subscription = auth()->user()->subscription();
 
-        if ($subscription->active()) {
+        if ($subscription and $subscription->active()) {
             return view('billing.subscription', compact('subscription'));
         }
 

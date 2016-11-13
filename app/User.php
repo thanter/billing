@@ -33,10 +33,14 @@ class User extends Authenticatable
 
     public function subscription()
     {
-        $subscription = (new \App\Subscription)->newFromSubscription(
-            $this->subscriptions()->first()
-        );
+        $latestSubscription = $this->subscriptions()->first();
 
-        return $subscription;
+        if ($latestSubscription) {
+            $latestSubscription = (new \App\Subscription)->newFromSubscription(
+                $latestSubscription
+            );
+        }
+
+        return $latestSubscription;
     }
 }
