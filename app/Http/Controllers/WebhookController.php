@@ -11,22 +11,27 @@ use Laravel\Cashier\Http\Controllers\WebhookController as CashierController;
 
 class WebhookController extends CashierController
 {
-    public function handleCheck(WebhookNotification $notification)
-    {
-        Log::info('here');
-    }
-
     public function handleSubscriptionChargedSuccessfully(WebhookNotification $notification)
     {
-        Log::info('active');
+        Log::info('charged successfully');
         Log::info($notification->subscription->id);
 
         return new Response('Webhook Handled', 200);
     }
 
+
+    public function handleSubscriptionChargedUnsuccessfully(WebhookNotification $notification)
+    {
+        Log::info('charged failed');
+        Log::info($notification->subscription->id);
+
+        return new Response('Webhook Handled', 200);
+    }
+
+
     public function handleSubscriptionWentActive(WebhookNotification $notification)
     {
-        Log::info('active');
+        Log::info('went active');
         Log::info($notification->subscription->id);
 
         return new Response('Webhook Handled', 200);

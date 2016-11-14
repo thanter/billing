@@ -8,134 +8,132 @@ use Illuminate\Http\Request;
 
 class BillingController extends Controller
 {
-    public function getSubscribe($planName)
-    {
-        $plan = Plan::findByName($planName);
 
-        $clientToken = Braintree_ClientToken::generate();
-        $subscription = auth()->user()->subscription();
-
-        return view('billing.subscribe', compact('clientToken', 'plan', 'subscription'));
-    }
-
-
-    public function postSubscribe(Request $request, $planName)
-    {
-        $user = auth()->user();
-
-        $subscription = $user->subscription();
-
-        if ($subscription and $subscription->active()) {
-            $user->subscription()->cancelNow();
-        }
-
-        $paymentMethodNonce = request('payment_method_nonce');
-
-        // returns Laravel\Cashier\Subscription
-        $user->newSubscription('default', $planName)->create($paymentMethodNonce);
-
-        return redirect()->route('subscription.status');
-    }
-
-
-
-    public function getSubscription()
+    /**
+     * Shows the current status of the subscription
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
+    public function subscription()
     {
         $subscription = auth()->user()->subscription();
 
-        if ($subscription and $subscription->active()) {
-            return view('billing.subscription', compact('subscription'));
+        if ($subscription) {
+            // Active or OnGracePeriod
+            if ($subscription->active()) {
+                return view('billing.subscription', compact('subscription'));
+            }
+
+            // Cancelled
+            if ($subscription->cancelled()) {
+                return redirect()->route('home');
+            }
         }
 
         return redirect()->route('home');
     }
 
 
+    /**
+     * Form to pay for new subscription
+     *
+     * @param $planName
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function subscribe($planName)
+    {
+        // selected plan
+        $plan = Plan::findByName($planName);
+        $clientToken = Braintree_ClientToken::generate();
 
+        return view('billing.subscribe', compact('clientToken', 'plan'));
+    }
+
+
+    /**
+     * Handles the subscription creation and save
+     * Mind the middleware!
+     *
+     * @param Request $request
+     * @param $planName
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function postSubscribe(Request $request, $planName)
+    {
+        $paymentMethodNonce = $request->get('payment_method_nonce');
+
+        auth()->user()->newSubscription('default', $planName)
+                      ->create($paymentMethodNonce);
+
+        return redirect()->route('subscription.status');
+    }
+
+
+    /**
+     * Cancels subscription and
+     * puts it on grace period
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function cancelSubscription()
     {
-        $response = auth()->user()->subscription()->cancel();
+        auth()->user()->subscription()->cancel();
 
         return redirect()->route('subscription.status');
     }
 
 
-    public function reactivateSubscription()
-    {
-        $response = auth()->user()->subscription()->resume();
-
-        return redirect()->route('subscription.status');
-    }
-
-
+    /**
+     * Cancels subscription for good
+     * no grace period
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function cancelSubscriptionForGood()
     {
-        $response = auth()->user()->subscription()->cancelNow();
+        auth()->user()->subscription()->cancelNow();
 
         return redirect()->route('subscription.status');
     }
 
 
+    /**
+     * Reactivate a cancelled subscription
+     * that is on its grace period
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function reactivateSubscription()
+    {
+        auth()->user()->subscription()->resume();
+
+        return redirect()->route('subscription.status');
+    }
+
+
+    /**
+     * Swap current subscription for the higher one
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function upgrade()
     {
-        $planName = 'high_monthly';
-
-        $response = auth()->user()->subscription()->swap($planName);
+        // Plan is hard coded for now
+        auth()->user()->subscription()->swap('high_monthly');
 
         return redirect()->route('subscription.status');
     }
 
 
+    /**
+     * Swap current subscription for the lower one
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function downgrade()
     {
-        $planName = 'low_monthly';
-
-        $response = auth()->user()->subscription()->swap($planName);
+        auth()->user()->subscription()->swap('low_monthly');
 
         return redirect()->route('subscription.status');
-    }
-
-
-
-
-    public function getPayingMethod()
-    {
-        $clientToken = \Braintree_ClientToken::generate([
-            "customerId" => auth()->user()->braintree_id
-        ]);
-
-        $paymentMethod = auth()->user()->asBraintreeCustomer()->defaultPaymentMethod();
-
-        if ($paymentMethod instanceof \Braintree\PayPalAccount) {
-            $isPaypal = true;
-        }
-
-        if ($paymentMethod instanceof \Braintree\CreditCard) {
-            $isPaypal = false;
-        }
-
-        return view('billing.paymentMethod', compact('paymentMethod', 'isPaypal', 'clientToken'));
-    }
-
-
-    public function postPayingMethod(Request $request)
-    {
-        $creditCardToken = request('payment_method_nonce');
-
-        auth()->user()->updateCard($creditCardToken);
-
-        return redirect()->route('payment.method');
-    }
-
-
-    public function invoices()
-    {
-        $invoice = auth()->user()->invoices()->first();
-
-        echo $invoice->id;
-        echo $invoice->date()->toFormattedDateString(). "<br>";
-        echo $invoice->total(). "<br>";
-
-
     }
 }

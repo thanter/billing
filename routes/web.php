@@ -11,78 +11,51 @@
 |
 */
 
-use App\User;
-
 Route::get('/', function () {
     return view('welcome');
 });
-
-
 Auth::routes();
-
 Route::get('/home', 'HomeController@index')->name('home');
 
 
-/***** Getting a new subscription *****/
-// GET
-Route::get('subscribe/{plan}', 'BillingController@getSubscribe')
-    ->where('plan', "high_monthly|low_monthly")
-    ->name('subscribe');
-// POST
-Route::post('subscribe/{plan}', 'BillingController@postSubscribe')
-    ->where('plan', "high_monthly|low_monthly")
-    ->name('subscribe');
+
+Route::group(['middleware' => 'auth'], function () {
+
+    /***** Current subscription status *****/
+    Route::get('subscription', 'BillingController@subscription')->name('subscription.status');
 
 
-Route::get('subscription', 'BillingController@getSubscription')->name('subscription.status');
+    /***** Getting a new subscription *****/
+    // GET
+    Route::get('subscribe/{plan}', 'BillingController@subscribe')
+        ->where('plan', "high_monthly|low_monthly")
+        ->name('subscribe');
+    // POST
+    Route::post('subscribe/{plan}', 'BillingController@postSubscribe')
+        ->where('plan', "high_monthly|low_monthly")
+        ->middleware('reset')
+        ->name('subscribe');
 
 
-Route::get('subscription/cancel', 'BillingController@cancelSubscription')->name('subscription.cancel');
-Route::get('subscription/cancelNow', 'BillingController@cancelSubscriptionForGood')->name('subscription.cancelNow');
-Route::get('subscription/reactivate', 'BillingController@reactivateSubscription')->name('subscription.reactivate');
-
-Route::get('subscription/upgrade', 'BillingController@upgrade')->name('subscription.upgrade');
-Route::get('subscription/downgrade', 'BillingController@downgrade')->name('subscription.downgrade');
-
-Route::get('paying', 'BillingController@getPayingMethod')->name('payment.method');
-Route::post('paying', 'BillingController@postPayingMethod')->name('payment.method');
+    /***** Cancel subscription *****/
+    Route::get('subscription/cancel', 'BillingController@cancelSubscription')->name('subscription.cancel');
+    Route::get('subscription/cancelNow', 'BillingController@cancelSubscriptionForGood')->name('subscription.cancelNow');
+    Route::get('subscription/reactivate', 'BillingController@reactivateSubscription')->name('subscription.reactivate');
 
 
-Route::get('invoice', 'BillingController@invoices')->name('invoices');
+    /***** Change subscription *****/
+    Route::get('subscription/upgrade', 'BillingController@upgrade')->name('subscription.upgrade');
+    Route::get('subscription/downgrade', 'BillingController@downgrade')->name('subscription.downgrade');
 
 
-//Route::get(
-//    'braintree/webhook',
-//    function() {
-//        Log::info('check');
-//        return response('ok', 201);
-//    }
-//);
-//
-//
-////Route::post(
-////    'braintree/webhook',
-////    '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook'
-////);
+    /***** Invoices *****/
+    Route::get('invoice', 'InvoicesController@all')->name('invoices');
 
 
-
-
-
-
-Route::get("/nteath", function()
-{
-    Log::info('here');
-    return 'test';
-    $user = User::find(2);
-
-    $subscription = $user->subscription();
-
-    return $subscription;
-
-    $plan = $subscription->plan;
-
-    dd($plan);
-
-    return $user->subscription();
+    /***** Payment methods *****/
+    Route::get('paying', 'PayingMethodsController@defaultMethod')->name('payment.method');
+    Route::post('paying', 'PayingMethodsController@update')->name('payment.method');
 });
+
+/***** Webhooks *****/
+Route::post('braintree/webhook', 'WebhookController@handleWebhook');

@@ -57,9 +57,10 @@
                         @else
                             @if (Auth::user()->subscription() !==  null)
                                 <li>
-                                    <a href="{{ route('payment.method') }}">
-                                        <i class="fa fa-dollar"></i> Payment method
-                                    </a>
+                                    <a href="{{ route('payment.method') }}">Payment method</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('invoices') }}">Invoices</a>
                                 </li>
                             @endif
                             <li class="dropdown">

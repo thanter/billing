@@ -5,13 +5,14 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
 
-                @if ($subscription)
-                    @if ($subscription->onGracePeriod())
+                @if (Auth::user()->subscription())
+                    @if (Auth::user()->subscription()->onGracePeriod())
                         <div class="alert alert-warning">
-                            <strong>Warning!</strong> You are still on grace period from your last subscription. It will be cancelled if you proceed.
+                            <strong>Warning!</strong> You are still on grace period from your last subscription.
+                            It will be cancelled if you proceed.
                         </div>
-                    @elseif ($subscription->active())
-                        <div class="alert alert-warning">
+                    @elseif (Auth::user()->subscription()->active())
+                        <div class="alert alert-danger">
                             <strong>Warning!</strong> Your subscription is still active. It will be cancelled if you proceed.
                         </div>
                     @endif
@@ -23,14 +24,14 @@
                         for $ {{ number_format($plan->price / 100) }} per month
                     </div>
 
-                    <div class="panel-body">
+                    <div>
                         <form action="{{ route('subscribe', $plan->name) }}" id="checkout" method="POST">
                             {{ csrf_field() }}
+                            <div class="panel-body" id="payment-form"></div>
 
-                            <div id="payment-form"></div>
-
-                            <br>
-                            <input type="submit" class="btn btn-success btn-block" value="Proceed">
+                            <div class="panel-footer">
+                                <input type="submit" class="btn btn-success btn-block" value="Proceed">
+                            </div>
                         </form>
                     </div>
                 </div>
