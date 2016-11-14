@@ -48,6 +48,22 @@ Route::get('paying', 'BillingController@getPayingMethod')->name('payment.method'
 Route::post('paying', 'BillingController@postPayingMethod')->name('payment.method');
 
 
+Route::get('invoice', 'BillingController@invoices')->name('invoices');
+
+
+//Route::get(
+//    'braintree/webhook',
+//    function() {
+//        Log::info('check');
+//        return response('ok', 201);
+//    }
+//);
+//
+//
+////Route::post(
+////    'braintree/webhook',
+////    '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook'
+////);
 
 
 
@@ -56,6 +72,8 @@ Route::post('paying', 'BillingController@postPayingMethod')->name('payment.metho
 
 Route::get("/nteath", function()
 {
+    Log::info('here');
+    return 'test';
     $user = User::find(2);
 
     $subscription = $user->subscription();

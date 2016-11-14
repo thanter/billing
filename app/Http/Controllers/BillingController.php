@@ -126,4 +126,16 @@ class BillingController extends Controller
 
         return redirect()->route('payment.method');
     }
+
+
+    public function invoices()
+    {
+        $invoice = auth()->user()->invoices()->first();
+
+        echo $invoice->id;
+        echo $invoice->date()->toFormattedDateString(). "<br>";
+        echo $invoice->total(). "<br>";
+
+
+    }
 }
