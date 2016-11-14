@@ -7,9 +7,17 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Invoices</div>
 
-                    <div class="panel-body"></div>
-
-                    <div class="panel-footer"></div>
+                    <div class="panel-body">
+                        <table class="table">
+                            @foreach ($invoices as $invoice)
+                                <tr>
+                                    <td>{{ $invoice->date()->toFormattedDateString() }}</td>
+                                    <td>{{ $invoice->total() }}</td>
+                                    <td><a href="{{ route('invoice.download', $invoice->id) }}">Download</a></td>
+                                </tr>
+                            @endforeach
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

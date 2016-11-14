@@ -50,6 +50,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     /***** Invoices *****/
     Route::get('invoice', 'InvoicesController@all')->name('invoices');
+    Route::get('invoice/download/{id}', 'InvoicesController@download')->name('invoice.download');
 
 
     /***** Payment methods *****/

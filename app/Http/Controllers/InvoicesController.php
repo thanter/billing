@@ -10,19 +10,16 @@ class InvoicesController extends Controller
     {
         $invoices = auth()->user()->invoices();
 
-        dd($invoices);
-
         return view('billing.invoices.index', compact('invoices'));
     }
 
 
 
-    public function download($invoiceId)
+    public function download($id)
     {
-        $invoice = auth()->user()->invoices()->first();
-
-        echo $invoice->id;
-        echo $invoice->date()->toFormattedDateString(). "<br>";
-        echo $invoice->total(). "<br>";
+        return auth()->user()->downloadInvoice($id, [
+            'vendor'  => 'Acme Corp',
+            'product' => 'Dynamite',
+        ]);
     }
 }
