@@ -6,14 +6,12 @@ class DatabaseSeeder extends Seeder
 {
     protected $tables = [
         'users',
-        'plans',
         'subscriptions',
     ];
 
 
     protected $seeders = [
         UsersTableSeeder::class,
-        PlansTableSeeder::class,
     ];
 
     public function run()

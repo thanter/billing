@@ -2,10 +2,9 @@
 
 namespace App;
 
+use Laravel\Cashier\Billable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Cashier\Billable;
-use Laravel\Cashier\Subscription;
 
 class User extends Authenticatable
 {
@@ -42,5 +41,18 @@ class User extends Authenticatable
         }
 
         return $latestSubscription;
+    }
+
+
+    /**
+     * User's current plan
+     *
+     * @return mixed
+     */
+    public function plan()
+    {
+        $planName = $this->subscription()->braintree_plan;
+
+        return plan($planName);
     }
 }

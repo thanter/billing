@@ -20,19 +20,20 @@
                         </p>
                         <p>
                             Plan
-                            <span class="pull-right">{{ $subscription->plan->name }}</span>
+                            <span class="pull-right">{{ $subscription->plan()->getTitle() }}</span>
                         </p>
                         <p>
-                            @if ($subscription->plan->hasHigher())
-                                <a href="{{ route('subscription.upgrade') }}">
-                                    <span class="label label-primary pull-right">Upgrade</span>
-                                </a>
-                            @elseif ($subscription->plan->hasLower())
-                                <a href="{{ route('subscription.downgrade') }}">
-                                    <span class="label label-primary pull-right">Downgrade</span>
-                                </a>
-                                </span>
-                            @endif
+                            {{--TODO: REDO THIS--}}
+                            {{--@if ($subscription->plan()->hasHigher())--}}
+                                {{--<a href="{{ route('subscription.upgrade') }}">--}}
+                                    {{--<span class="label label-primary pull-right">Upgrade</span>--}}
+                                {{--</a>--}}
+                            {{--@elseif ($subscription->plan()->hasLower())--}}
+                                {{--<a href="{{ route('subscription.downgrade') }}">--}}
+                                    {{--<span class="label label-primary pull-right">Downgrade</span>--}}
+                                {{--</a>--}}
+                                {{--</span>--}}
+                            {{--@endif--}}
                         </p>
 
                     </div>

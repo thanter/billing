@@ -42,8 +42,8 @@ class BillingController extends Controller
      */
     public function subscribe($planName)
     {
-        // selected plan
-        $plan = Plan::findByName($planName);
+        $plan = plan($planName);
+
         $clientToken = Braintree_ClientToken::generate();
 
         return view('billing.subscribe', compact('clientToken', 'plan'));

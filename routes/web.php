@@ -11,12 +11,28 @@
 |
 */
 
+
+use App\PlanConfig;
+use App\User;
+
 Route::get('/', function () {
     return view('welcome');
 });
 Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
+
+Route::get('/plans', function() {
+    dd(plan()->all());
+    // possible uses cases for plan()
+    // plan('silver') or plan('bronze')
+
+    // plan('silver', 'limits.entries') or plan('bronze', 'entries')
+
+    // plan('limits.entries') or plan('entries')
+
+    // plan()->getPlan('planName')
+});
 
 
 Route::group(['middleware' => 'auth'], function () {
@@ -28,11 +44,11 @@ Route::group(['middleware' => 'auth'], function () {
     /***** Getting a new subscription *****/
     // GET
     Route::get('subscribe/{plan}', 'BillingController@subscribe')
-        ->where('plan', "high_monthly|low_monthly")
+//        ->where('plan', "high_monthly|low_monthly")
         ->name('subscribe');
     // POST
     Route::post('subscribe/{plan}', 'BillingController@postSubscribe')
-        ->where('plan', "high_monthly|low_monthly")
+//        ->where('plan', "high_monthly|low_monthly")
         ->middleware('reset')
         ->name('subscribe');
 

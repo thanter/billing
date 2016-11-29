@@ -13,7 +13,9 @@ class Subscription extends CashierSubscription
      */
     public function plan()
     {
-        return $this->belongsTo(Plan::class, 'braintree_plan', 'braintree_plan_id');
+        $planName = $this->braintree_plan;
+
+        return plan($planName);
     }
 
 

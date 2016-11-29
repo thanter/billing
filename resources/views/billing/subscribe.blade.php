@@ -20,12 +20,12 @@
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Subscribe to plan <strong>{{ ucfirst($plan->priceName) }}</strong>
-                        for $ {{ number_format($plan->price / 100) }} per month
+                        Subscribe to plan <strong>{{ ucfirst($plan->getTitle()) }}</strong>
+                        for $ {{ $plan->getPrice() }} per month
                     </div>
 
                     <div>
-                        <form action="{{ route('subscribe', $plan->name) }}" id="checkout" method="POST">
+                        <form action="{{ route('subscribe', $plan->getKey()) }}" id="checkout" method="POST">
                             {{ csrf_field() }}
                             <div class="panel-body" id="payment-form"></div>
 

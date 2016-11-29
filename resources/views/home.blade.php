@@ -8,12 +8,23 @@
                 <div class="panel-heading">Dashboard</div>
 
                 <div class="panel-body">
-                    <p>
-                        I want the cheap plan for <a href="{{ route('subscribe', 'low_monthly') }}">$5 per month</a>
-                    </p>
-                    <p>
-                        I want the expensive plan for <a href="{{ route('subscribe', 'high_monthly') }}">$10 per month</a>
-                    </p>
+                    <h3 class="text-center">We offer 3 plans. The longer the better ;)</h3>
+                    <br>
+
+
+                    {{--TODO: DO NOT HARDCODE PLAN NAMES AND PRICES--}}
+                    {{--TODO: RETRIEVE THEM FROM CONFIG--}}
+
+                    <ul class="list-group">
+                        @foreach ($plans as $plan)
+                            <li class="list-group-item">
+                                <a href="{{ route('subscribe', $plan->getKey()) }}">
+                                    {{ ucfirst($plan->getTitle()) }}
+                                </a>
+                                ($ {{ $plan->getPrice() }} / month)
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
         </div>
