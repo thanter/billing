@@ -20,7 +20,7 @@
                         </p>
                         <p>
                             Plan
-                            <span class="pull-right">{{ $subscription->plan()->getTitle() }}</span>
+                            <span class="pull-right">{{ $subscription->plan()->title }}</span>
                         </p>
                         <p>
                             {{--TODO: REDO THIS--}}
@@ -34,6 +34,10 @@
                                 {{--</a>--}}
                                 {{--</span>--}}
                             {{--@endif--}}
+                        </p>
+                        <p>
+                            Subscription
+                            <span class="pull-right">{{ ucfirst($subscription->plan()->duration) }}ly</span>
                         </p>
 
                     </div>

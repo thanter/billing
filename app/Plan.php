@@ -4,76 +4,33 @@ namespace App;
 
 class Plan
 {
-    protected $key;
-    protected $title;
-    protected $description;
-    protected $price;
-    protected $limits;
-
-    public function __construct($plan)
-    {
-        foreach($plan as $key => $value) {
-            $this->$key = $value;
-        }
-    }
-
-
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
+    public $key;
+    public $title;
+    public $price;
+    public $limits;
+    public $duration;
+    public $configKey;
+    public $description;
 
 
     public function getPrice($formatted = true)
     {
         if ($formatted) {
-            return number_format($this->price / 100);
+            return number_format((int) $this->price / 100);
         }
 
         return $this->price;
     }
 
 
-    public function getLimits()
-    {
-        return $this->limits;
-    }
-
-
-    /**
-     * Get a plan's limit's value by its key
-     *
-     * @param $key
-     * @return mixed
-     * @throws \Exception
-     */
-    public function getLimit($key)
-    {
-        $limits = $this->getLimits();
-
-        if (! array_key_exists($key, $limits)) {
-            throw new \Exception("Key '" . $key . "' is not one of the limits for the plan.");
-        }
-
-        return $this->$limits[$key];
-    }
-
 
     /**
      * Get a plan's attribute.
      * If provided key does not exist as attribute
      * Check if provided key exists as plan's limit attribute
+     * eg. getAttribute('price')
+     * eg. getAttribute('limits.entries')
+     * eg. getAttribute('entries')
      *
      * @param $key
      * @return mixed
@@ -94,6 +51,23 @@ class Plan
 
 
 
+    /**
+     * Get a plan's limit's value by its key
+     *
+     * @param $key
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getLimit($key)
+    {
+        $limits = $this->limits;
+
+        if (! array_key_exists($key, $limits)) {
+            throw new \Exception("Key '" . $key . "' is not one of the limits for the plan.");
+        }
+
+        return $limits[$key];
+    }
 
 
 

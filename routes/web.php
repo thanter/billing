@@ -23,15 +23,22 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 
 Route::get('/plans', function() {
-    dd(plan()->all());
     // possible uses cases for plan()
-    // plan('silver') or plan('bronze')
+    // dd(get_class(plan()))
+    // dd(plan()->getPlan('planName'))
 
-    // plan('silver', 'limits.entries') or plan('bronze', 'entries')
+    // plan('silver') or plan('bronze')
+    // dd(plan('silver'));
+
+    // plan('silver_yearly' or plan('golden_monthly')
+    // dd(plan('golden_monthly'));
+    // dd(plan('golden_monthly', 'limits.entries'));
+    // dd(plan('silver_monthly', 'entries'));
+
 
     // plan('limits.entries') or plan('entries')
-
-    // plan()->getPlan('planName')
+    // dd(plan('limits.entries'));
+    // dd(plan('entries'));
 });
 
 

@@ -11,17 +11,14 @@
                     <h3 class="text-center">We offer 3 plans. The longer the better ;)</h3>
                     <br>
 
-
-                    {{--TODO: DO NOT HARDCODE PLAN NAMES AND PRICES--}}
-                    {{--TODO: RETRIEVE THEM FROM CONFIG--}}
-
                     <ul class="list-group">
                         @foreach ($plans as $plan)
                             <li class="list-group-item">
-                                <a href="{{ route('subscribe', $plan->getKey()) }}">
-                                    {{ ucfirst($plan->getTitle()) }}
+                                <h4 class="text-center">{{ ucfirst($plan->title) }}</h4>
+
+                                <a href="{{ route('subscribe', $plan->key) }}">
+                                    I want this subscription for $ {{ $plan->getPrice() }} / {{ $plan->duration }}
                                 </a>
-                                ($ {{ $plan->getPrice() }} / month)
                             </li>
                         @endforeach
                     </ul>

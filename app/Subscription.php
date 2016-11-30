@@ -21,13 +21,9 @@ class Subscription extends CashierSubscription
 
     public function newFromSubscription($source)
     {
-        $instance = $this;
+        $this->setRawAttributes($source->attributes, true);
+        $this->exists = true;
 
-        // $values = get_object_vars($source);
-
-        $instance->setRawAttributes($source->attributes, true);
-        $instance->exists = true;
-
-        return $instance;
+        return $this;
     }
 }
