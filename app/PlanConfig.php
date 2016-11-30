@@ -9,26 +9,126 @@ use Illuminate\Database\Eloquent\Collection;
 
 class PlanConfig
 {
-    protected $auth;
+    private $tiers;
+    private $default;
 
-    protected $allPlans;
-    protected $paidPlans;
-    protected $defaultPlans;
-
-    public function __construct(Guard $guard)
+    public function __construct()
     {
-        $this->auth  = $guard;
-        $this->paidPlans = config('plans.paid');
-        $this->defaultPlans = config('plans.default');
-        $this->allPlans = array_merge($this->defaultPlans, $this->paidPlans);
+        $this->default = config('plans.default');
+        $this->tiers = config('plans.tiers');
+    }
+
+
+    public function defaultPlansRaw()
+    {
+        return $this->default;
+    }
+
+
+    public function tiersRaw()
+    {
+        return $this->tiers;
+    }
+
+
+    public function allRaw()
+    {
+        return array_merge($this->defaultPlansRaw(), $this->tiersRaw());
+    }
+
+
+    public function defaultPlans()
+    {
+        $defaultPlans = new Collection;
+        foreach ($this->defaultPlansRaw() as $plan) {
+            $defaultPlans->add(
+                $this->buildDefaultPlan($plan)
+            );
+        }
+
+        return $defaultPlans;
+    }
+
+
+    public function tiers()
+    {
+        $tiers = new Collection;
+        foreach ($this->tiersRaw() as $plan) {
+            foreach ($plan['charge_modes'] as $duration => $info) {
+                $tiers->add(
+                    $this->buildTier($plan, $duration)
+                );
+            }
+        }
+
+        return $tiers;
+    }
+
+
+    public function all()
+    {
+        return $this->defaultPlans()->merge($this->tiers());
+    }
+
+
+    public function getPlanRaw($key)
+    {
+        if (! array_key_exists($key, $this->allRaw())) {
+            throw new \Exception("Requested plan '" . $key . "' does not exist.");
+        }
+
+        return $this->allRaw()[$key];
+    }
+
+
+    public function getPlan($key)
+    {
+        // Returns the plan as configured in plans.php
+        if (! str_contains($key, '_')) {
+            throw new \Exception("If you want to retrieve the original plan from configuration, use the 'raw' methods.");
+        }
+
+        // Return the request plan as object
+        $temp     = explode("_", $key);
+        $planName = $temp[0];
+        $duration = $temp[1];
+
+        // Build one of the defaults
+        if (empty($duration)) {
+            return $this->buildDefaultPlan($this->getPlanRaw($planName));
+        }
+
+        // Build a tier plan object
+        return $this->buildTier(
+            $this->getPlanRaw($planName), $duration === "monthly" ? "month" : "year"
+        );
+    }
+
+
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+    private function buildDefaultPlan(array $plan)
+    {
+        if (! array_key_exists($plan["key"], $this->defaultPlansRaw())) {
+            throw new \Exception("Requested plan '" . $plan['key'] . "' does not exist.");
+        }
+
+        $planObj = new Plan;
+        $planObj->configKey   = $planObj->key = $plan['key'];
+        $planObj->title       = $plan['title'];
+        $planObj->description = $plan['description'];
+        $planObj->limits      = $plan['limits'];
+        $planObj->type        = "default";
+
+        return $planObj;
     }
 
 
 
-    private function build(array $plan, $chargeMode = ['month', 'year'])
+    private function buildTier(array $plan, $chargeMode = ['month', 'year'])
     {
-        dd($plan);
-        if (!array_key_exists($plan['key'], $this->plans)) {
+        if (!array_key_exists($plan['key'], $this->tiersRaw())) {
             throw new \Exception("Requested plan '" . $plan['key'] . "' does not exist.");
         }
 
@@ -41,71 +141,9 @@ class PlanConfig
         $planObj->duration    = $chargeMode;
         $planObj->price       = $plan['charge_modes'][$chargeMode]['price'];
         $planObj->limits      = $plan['limits'];
+        $planObj->type        = "tier";
 
         return $planObj;
-    }
-
-
-
-    public function paid()
-    {
-        $plans = new Collection;
-
-        foreach ($this->paidPlans as $plan) {
-            foreach ($plan['charge_modes'] as $duration => $info) {
-                $plans->add($this->build($plan, $duration));
-            }
-        }
-
-        return $plans;
-    }
-
-
-
-    /**
-     * Returns the plan as object
-     * Make sure it contains _
-     *
-     * @param $planName
-     * @return Plan
-     * @throws \Exception
-     */
-    public function get($planName)
-    {
-        // Returns the plan as configured in plans.php
-        if (!str_contains($planName, '_')) {
-            throw new \Exception("If you want to retrieve the original plan configuration, use getRaw()");
-        }
-
-        // Return the request plan as object
-        $temp     = explode("_", $planName);
-        $planName = $temp[0];
-        $duration = $temp[1] === "monthly" ? "month" : "year";
-
-        return $this->build($this->allPlans[$planName], $duration);
-    }
-
-
-    public function allRaw()
-    {
-        return array_merge($this->defaultPlans, $this->paidPlans);
-    }
-
-
-    public function paidRaw()
-    {
-        return $this->paidPlans;
-    }
-
-
-
-    public function getRaw($planName)
-    {
-        if (!array_key_exists($planName, $this->allPlans)) {
-            throw new \Exception("Requested plan '" . $planName . "' does not exist.");
-        }
-
-        return $this->allPlans[$planName];
     }
 
 
@@ -117,11 +155,11 @@ class PlanConfig
      */
     public function userPlan()
     {
-        if (! $this->auth->check()) {
+        if (! auth()->check()) {
             throw new Authentication("User is not authenticated");
         }
 
-        return $this->auth->user()->plan();
+        return auth()->user()->plan();
     }
 }
 

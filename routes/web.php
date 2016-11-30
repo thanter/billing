@@ -21,20 +21,20 @@ Route::get('/', function () {
 Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
+Route::get('/test', function(){
+    $config = plan();
 
-Route::get('/nteath', function() {
-
-    dd(plan('trial_'));
-
+    dd($config->getPlan('bronze_yearly'));
 });
+
 
 Route::get('/plans', function() {
     // possible uses cases for plan()
-    // dd(get_class(plan()))
+    // dd(get_class(plan()));
     // dd(plan()->getPlan('planName'))
 
     // plan('silver') or plan('bronze')
-    // dd(plan('silver'));
+    dd(plan('free_'));
 
     // plan('silver_yearly' or plan('golden_monthly')
     // dd(plan('golden_monthly'));

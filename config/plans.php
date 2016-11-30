@@ -12,7 +12,7 @@ return [
             ]
         ],
 
-        'free_' => [
+        'free' => [
             'key' => 'free',
             'title' => 'Free | Tzampatzis',
             'description' => 'This is the description for the free plan.',
@@ -21,7 +21,7 @@ return [
             ]
         ],
 
-        'legacy_' => [
+        'legacy' => [
             'key' => 'legacy',
             'title' => 'Legacy | Old users',
             'description' => 'This is the description for the legacy plan.',
@@ -32,7 +32,7 @@ return [
     ],
 
 
-    'paid' => [
+    'tiers' => [
         'bronze' => [
             'key' => 'bronze',
             'title' => 'Bronze | Entry level plan',

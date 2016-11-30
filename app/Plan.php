@@ -11,7 +11,13 @@ class Plan
     public $duration;
     public $configKey;
     public $description;
+    public $type;
 
+
+    public function getKey()
+    {
+        return $this->key;
+    }
 
     public function getPrice($formatted = true)
     {
