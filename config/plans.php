@@ -2,10 +2,39 @@
 
 return [
 
-    'available'      => [
+    'default' => [
+        'trial' => [
+            'key' => 'trial',
+            'title' => 'Trial | Starter',
+            'description' => 'This is the description for the trial plan.',
+            'limits' => [
+                'entries' => 5,
+            ]
+        ],
 
+        'free_' => [
+            'key' => 'free',
+            'title' => 'Free | Tzampatzis',
+            'description' => 'This is the description for the free plan.',
+            'limits' => [
+                'entries' => 5,
+            ]
+        ],
+
+        'legacy_' => [
+            'key' => 'legacy',
+            'title' => 'Legacy | Old users',
+            'description' => 'This is the description for the legacy plan.',
+            'limits' => [
+                'entries' => 5,
+            ]
+        ],
+    ],
+
+
+    'paid' => [
         'bronze' => [
-            'key'  => 'bronze',
+            'key' => 'bronze',
             'title' => 'Bronze | Entry level plan',
             'description' => 'This is the description for the bronze plan.',
             'charge_modes' => [
@@ -22,7 +51,7 @@ return [
         ],
 
         'silver' => [
-            'key'  => 'silver',
+            'key' => 'silver',
             'title' => 'Silver | Medium level plan',
             'description' => 'This is the description for the silver plan.',
             'charge_modes' => [
@@ -39,7 +68,7 @@ return [
         ],
 
         'golden' => [
-            'key'  => 'golden',
+            'key' => 'golden',
             'title' => 'Golden | High level plan',
             'description' => 'This is the description for the golden plan.',
             'charge_modes' => [

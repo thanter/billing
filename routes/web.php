@@ -22,6 +22,12 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 
+Route::get('/nteath', function() {
+
+    dd(plan('trial_'));
+
+});
+
 Route::get('/plans', function() {
     // possible uses cases for plan()
     // dd(get_class(plan()))

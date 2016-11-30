@@ -39,7 +39,6 @@
                             Subscription
                             <span class="pull-right">{{ ucfirst($subscription->plan()->duration) }}ly</span>
                         </p>
-
                     </div>
 
                     <div class="panel-footer">

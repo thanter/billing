@@ -11,18 +11,23 @@ class PlanConfig
 {
     protected $auth;
 
-    protected $plans;
+    protected $allPlans;
+    protected $paidPlans;
+    protected $defaultPlans;
 
     public function __construct(Guard $guard)
     {
         $this->auth  = $guard;
-        $this->plans = config('plans.available');
+        $this->paidPlans = config('plans.paid');
+        $this->defaultPlans = config('plans.default');
+        $this->allPlans = array_merge($this->defaultPlans, $this->paidPlans);
     }
 
 
 
     private function build(array $plan, $chargeMode = ['month', 'year'])
     {
+        dd($plan);
         if (!array_key_exists($plan['key'], $this->plans)) {
             throw new \Exception("Requested plan '" . $plan['key'] . "' does not exist.");
         }
@@ -42,11 +47,11 @@ class PlanConfig
 
 
 
-    public function all()
+    public function paid()
     {
         $plans = new Collection;
 
-        foreach ($this->plans as $plan) {
+        foreach ($this->paidPlans as $plan) {
             foreach ($plan['charge_modes'] as $duration => $info) {
                 $plans->add($this->build($plan, $duration));
             }
@@ -77,25 +82,30 @@ class PlanConfig
         $planName = $temp[0];
         $duration = $temp[1] === "monthly" ? "month" : "year";
 
-        return $this->build($this->plans[$planName], $duration);
+        return $this->build($this->allPlans[$planName], $duration);
     }
-
 
 
     public function allRaw()
     {
-        return $this->plans;
+        return array_merge($this->defaultPlans, $this->paidPlans);
+    }
+
+
+    public function paidRaw()
+    {
+        return $this->paidPlans;
     }
 
 
 
     public function getRaw($planName)
     {
-        if (!array_key_exists($planName, $this->plans)) {
+        if (!array_key_exists($planName, $this->allPlans)) {
             throw new \Exception("Requested plan '" . $planName . "' does not exist.");
         }
 
-        return $this->plans[$planName];
+        return $this->allPlans[$planName];
     }
 
 
