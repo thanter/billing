@@ -24,7 +24,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $plans = plan()->all();
+        $plans = plan()->tiers();
 
         return view('home', compact('plans'));
     }

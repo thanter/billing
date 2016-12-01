@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'status', 'name', 'email', 'password',
     ];
 
     /**
@@ -30,17 +30,31 @@ class User extends Authenticatable
     ];
 
 
-    public function subscription()
+    public function isPaid()
     {
-        $latestSubscription = $this->subscriptions()->first();
+        $lastSubscription = $this->subscription();
 
-        if ($latestSubscription) {
-            $latestSubscription = (new \App\Subscription)->newFromSubscription(
-                $latestSubscription
-            );
+        // User does not have a subscription yet
+        if (is_null($lastSubscription)) {
+            return false;
         }
 
-        return $latestSubscription;
+        return (bool) $lastSubscription->isActive();
+    }
+
+
+    public function subscription()
+    {
+        $lastSubscription = $this->subscriptions()->first();
+
+        // User does not have a subscription yet
+        if (is_null($lastSubscription)) {
+            return null;
+        }
+
+        return (new \App\Subscription)->newFromSubscription(
+            $lastSubscription
+        );
     }
 
 
@@ -51,7 +65,15 @@ class User extends Authenticatable
      */
     public function plan()
     {
-        $planName = $this->subscription()->braintree_plan;
+        $lastSubscription = $this->subscription();
+
+        if ($lastSubscription and $lastSubscription->isActive()) {
+            $planName = $lastSubscription->braintree_plan;
+        }
+        else {
+            $planName = $this->status . '_';
+        }
+
 
         return plan($planName);
     }

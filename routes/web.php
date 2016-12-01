@@ -22,7 +22,8 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/test', function(){
-    $config = plan();
+    $config = plan("entries");
+    dd($config);
 
     dd($config->getPlan('bronze_yearly'));
 });

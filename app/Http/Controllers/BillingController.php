@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Plan;
 use Braintree_ClientToken;
 use Illuminate\Http\Request;
+use Laravel\Cashier\Subscription;
 
 class BillingController extends Controller
 {
@@ -18,9 +18,10 @@ class BillingController extends Controller
     {
         $subscription = auth()->user()->subscription();
 
+
         if ($subscription) {
             // Active or OnGracePeriod
-            if ($subscription->active()) {
+            if ($subscription->isActive()) {
                 return view('billing.subscription', compact('subscription'));
             }
 
@@ -62,8 +63,13 @@ class BillingController extends Controller
     {
         $paymentMethodNonce = $request->get('payment_method_nonce');
 
-        auth()->user()->newSubscription('default', $planName)
-                      ->create($paymentMethodNonce);
+        $response = auth()->user()->newSubscription('default', $planName)
+                          ->create($paymentMethodNonce);
+
+
+        if ($response instanceof \Laravel\Cashier\Subscription) {
+            auth()->user()->update(['status' => 'paid']);
+        }
 
         return redirect()->route('subscription.status');
     }

@@ -20,7 +20,7 @@
                         </p>
                         <p>
                             Plan
-                            <span class="pull-right">{{ $subscription->plan()->title }}</span>
+                            <span class="pull-right">{{ $subscription->user->plan()->title }}</span>
                         </p>
                         <p>
                             {{--TODO: REDO THIS--}}
@@ -37,7 +37,7 @@
                         </p>
                         <p>
                             Subscription
-                            <span class="pull-right">{{ ucfirst($subscription->plan()->duration) }}ly</span>
+                            <span class="pull-right">{{ ucfirst($subscription->user->plan()->duration) }}ly</span>
                         </p>
                     </div>
 

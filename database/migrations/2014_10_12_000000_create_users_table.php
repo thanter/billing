@@ -15,6 +15,8 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
+            $table->enum('status', ['free', 'trial', 'legacy', 'paid'])->nullable()->default('trial');
+            $table->integer('trialExpires')->default(15);
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');

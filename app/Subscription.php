@@ -6,16 +6,9 @@ use Laravel\Cashier\Subscription as CashierSubscription;
 
 class Subscription extends CashierSubscription
 {
-    /**
-     * The plan of the subscription
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function plan()
+    public function isActive()
     {
-        $planName = $this->braintree_plan;
-
-        return plan($planName);
+        return (bool) $this->active();
     }
 
 

@@ -26,7 +26,7 @@ return [
             'title' => 'Legacy | Old users',
             'description' => 'This is the description for the legacy plan.',
             'limits' => [
-                'entries' => 5,
+                'entries' => 15,
             ]
         ],
     ],
